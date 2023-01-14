@@ -100,34 +100,34 @@ struct MarkovDrummerWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.3, 42.19)), module, MarkovDrummer::PARAMS + 0));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.3, 56.191)), module, MarkovDrummer::PARAMS + 1));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.3, 69.742)), module, MarkovDrummer::PARAMS + 2));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.3, 84.317)), module, MarkovDrummer::PARAMS + 3));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(30.9, 42.325)), module, MarkovDrummer::PARAMS + 4));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(30.9, 56.259)), module, MarkovDrummer::PARAMS + 5));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(30.9, 69.353)), module, MarkovDrummer::PARAMS + 6));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(30.9, 84.055)), module, MarkovDrummer::PARAMS + 7));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(45.6, 42.443)), module, MarkovDrummer::PARAMS + 8));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(45.6, 55.925)), module, MarkovDrummer::PARAMS + 9));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(45.6, 69.019)), module, MarkovDrummer::PARAMS + 10));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(45.6, 83.883)), module, MarkovDrummer::PARAMS + 11));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(56, 42.088)), module, MarkovDrummer::PARAMS + 12));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(56, 56.374)), module, MarkovDrummer::PARAMS + 13));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(56, 69.121)), module, MarkovDrummer::PARAMS + 14));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(56, 83.638)), module, MarkovDrummer::PARAMS + 15));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.458, 42.19)), module, MarkovDrummer::PARAMS + 0));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.458, 56.337)), module, MarkovDrummer::PARAMS + 1));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.458, 70.485)), module, MarkovDrummer::PARAMS + 2));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.458, 84.632)), module, MarkovDrummer::PARAMS + 3));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(30.828, 42.19)), module, MarkovDrummer::PARAMS + 4));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(30.828, 56.337)), module, MarkovDrummer::PARAMS + 5));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(30.828, 70.485)), module, MarkovDrummer::PARAMS + 6));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(30.828, 84.632)), module, MarkovDrummer::PARAMS + 7));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(45.199, 42.19)), module, MarkovDrummer::PARAMS + 8));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(45.199, 56.337)), module, MarkovDrummer::PARAMS + 9));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(45.199, 70.485)), module, MarkovDrummer::PARAMS + 10));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(45.199, 84.632)), module, MarkovDrummer::PARAMS + 11));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(59.57, 42.19)), module, MarkovDrummer::PARAMS + 12));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(59.57, 56.337)), module, MarkovDrummer::PARAMS + 13));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(59.57, 70.485)), module, MarkovDrummer::PARAMS + 14));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(59.57, 84.632)), module, MarkovDrummer::PARAMS + 15));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.525, 25.393)), module, MarkovDrummer::CLK_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(30.971, 25.393)), module, MarkovDrummer::RESET_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.458, 25.393)), module, MarkovDrummer::CLK_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(30.828, 25.393)), module, MarkovDrummer::RESET_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(16.782, 99.441)), module, MarkovDrummer::OUTS + 0));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(30.942, 99.042)), module, MarkovDrummer::OUTS + 1));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(45.263, 98.901)), module, MarkovDrummer::OUTS + 2));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(59.696, 98.886)), module, MarkovDrummer::OUTS + 3));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(16.357, 112.302)), module, MarkovDrummer::OUTS + 4));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(30.904, 112.478)), module, MarkovDrummer::OUTS + 5));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(45.068, 112.411)), module, MarkovDrummer::OUTS + 6));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(59.367, 112.744)), module, MarkovDrummer::OUTS + 7));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(16.458, 98.78)), module, MarkovDrummer::OUTS + 0));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(30.828, 98.78)), module, MarkovDrummer::OUTS + 1));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(45.199, 98.78)), module, MarkovDrummer::OUTS + 2));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(59.57, 98.78)), module, MarkovDrummer::OUTS + 3));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(16.458, 112.927)), module, MarkovDrummer::OUTS + 4));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(30.828, 112.927)), module, MarkovDrummer::OUTS + 5));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(45.199, 112.927)), module, MarkovDrummer::OUTS + 6));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(59.57, 112.927)), module, MarkovDrummer::OUTS + 7));
 	}
 };
 
