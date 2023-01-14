@@ -182,4 +182,4 @@ struct TransquantWidget : ModuleWidget {
 };
 
 
-Model* modelTransquant = createModel<Transquant, TransquantWidget>("transquant");
+Model* modelTransquant = createModel<Transquant, TransquantWidget>("Transquant");

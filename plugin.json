@@ -12,5 +12,12 @@
   "sourceUrl": "",
   "donateUrl": "",
   "changelogUrl": "",
-  "modules": []
+  "modules": [
+    {
+      "slug": "Transquant",
+      "name": "Transquant",
+      "description": "",
+      "tags": []
+    }
+  ]
 }
