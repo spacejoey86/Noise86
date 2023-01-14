@@ -18,6 +18,12 @@
       "name": "Transquant",
       "description": "",
       "tags": []
+    },
+    {
+      "slug": "MarkovDrummer",
+      "name": "MarkovDrummer",
+      "description": "Probablistic trigger sequencer based of Markov chains",
+      "tags": []
     }
   ]
 }
