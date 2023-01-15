@@ -38,6 +38,26 @@ struct MultiLogic : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
+		for (int LGate = 0; LGate < 3; LGate++) {
+			bool result;
+			if (inputs[INPUTS + 0 + 3*LGate].isConnected() &&
+				inputs[INPUTS + 1 + 3*LGate].isConnected() &&
+				! inputs[INPUTS + 2 + 3*LGate].isConnected()) {
+				//XOR gate
+				result = (inputs[INPUTS + 0 + 3*LGate].getVoltage() > 2.f) != (inputs[INPUTS + 1 + 3*LGate].getVoltage() > 2.f);
+
+			} else if (! inputs[INPUTS + 0 + 3*LGate].isConnected() &&
+						inputs[INPUTS + 1 + 3*LGate].isConnected() &&
+						inputs[INPUTS + 2 + 3*LGate].isConnected()) {
+				//AND gate
+				result = (inputs[INPUTS + 1 + 3*LGate].getVoltage() > 2.f) && (inputs[INPUTS + 2 + 3*LGate].getVoltage() > 2.f);
+			} else {
+				//OR gate
+				result = (inputs[INPUTS + 0 + 3*LGate].getVoltage() > 2.f) || (inputs[INPUTS + 1 + 3*LGate].getVoltage() > 2.f) || (inputs[INPUTS + 2 + 3*LGate].getVoltage() > 2.f);
+			}
+			outputs[QOUT + LGate].setVoltage(result ? 10.f : 0.f);
+			outputs[NQOUT + LGate].setVoltage(result ? 0.f : 10.f);
+		}
 	}
 };
 
