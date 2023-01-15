@@ -6,24 +6,12 @@ struct MultiLogic : Module {
 		PARAMS_LEN
 	};
 	enum InputId {
-		G1IN1_INPUT,
-		G1IN2_INPUT,
-		G1IN3_INPUT,
-		G2IN1_INPUT,
-		G2IN2_INPUT,
-		G2IN3_INPUT,
-		G3IN1_INPUT,
-		G3IN2_INPUT,
-		G3IN3_INPUT,
+		ENUMS(INPUTS, 9),
 		INPUTS_LEN
 	};
 	enum OutputId {
-		G1G__OUTPUT,
-		G1Q_OUTPUT,
-		G2Q__OUTPUT,
-		G2Q_OUTPUT,
-		G3Q__OUTPUT,
-		G3Q_OUTPUT,
+		ENUMS(QOUT, 3),
+		ENUMS(NQOUT, 3),
 		OUTPUTS_LEN
 	};
 	enum LightId {
@@ -32,21 +20,21 @@ struct MultiLogic : Module {
 
 	MultiLogic() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		configInput(G1IN1_INPUT, "");
-		configInput(G1IN2_INPUT, "");
-		configInput(G1IN3_INPUT, "");
-		configInput(G2IN1_INPUT, "");
-		configInput(G2IN2_INPUT, "");
-		configInput(G2IN3_INPUT, "");
-		configInput(G3IN1_INPUT, "");
-		configInput(G3IN2_INPUT, "");
-		configInput(G3IN3_INPUT, "");
-		configOutput(G1G__OUTPUT, "");
-		configOutput(G1Q_OUTPUT, "");
-		configOutput(G2Q__OUTPUT, "");
-		configOutput(G2Q_OUTPUT, "");
-		configOutput(G3Q__OUTPUT, "");
-		configOutput(G3Q_OUTPUT, "");
+		configInput(INPUTS + 0, "In 1");
+		configInput(INPUTS + 1, "In 2");
+		configInput(INPUTS + 2, "In 3");
+		configInput(INPUTS + 3, "In 4");
+		configInput(INPUTS + 4, "In 5");
+		configInput(INPUTS + 5, "In 6");
+		configInput(INPUTS + 6, "In 7");
+		configInput(INPUTS + 7, "In 8");
+		configInput(INPUTS + 8, "In 9");
+		configOutput(QOUT + 0, "Q");
+		configOutput(QOUT + 1, "Q");
+		configOutput(QOUT + 2, "Q");
+		configOutput(NQOUT + 0, "Q'");
+		configOutput(NQOUT + 1, "Q'");
+		configOutput(NQOUT + 2, "Q'");
 	}
 
 	void process(const ProcessArgs& args) override {
@@ -64,22 +52,22 @@ struct MultiLogicWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.525, 13.302)), module, MultiLogic::G1IN1_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.525, 26.705)), module, MultiLogic::G1IN2_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.525, 40.109)), module, MultiLogic::G1IN3_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.525, 52.171)), module, MultiLogic::G2IN1_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.525, 65.575)), module, MultiLogic::G2IN2_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.525, 78.979)), module, MultiLogic::G2IN3_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.525, 91.041)), module, MultiLogic::G3IN1_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.525, 104.445)), module, MultiLogic::G3IN2_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.525, 117.849)), module, MultiLogic::G3IN3_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.525, 13.302)), module, MultiLogic::INPUTS + 0));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.525, 26.705)), module, MultiLogic::INPUTS + 1));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.525, 40.109)), module, MultiLogic::INPUTS + 2));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.525, 52.171)), module, MultiLogic::INPUTS + 3));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.525, 65.575)), module, MultiLogic::INPUTS + 4));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.525, 78.979)), module, MultiLogic::INPUTS + 5));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.525, 91.041)), module, MultiLogic::INPUTS + 6));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.525, 104.445)), module, MultiLogic::INPUTS + 7));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.525, 117.849)), module, MultiLogic::INPUTS + 8));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(19.439, 20.004)), module, MultiLogic::G1G__OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(19.439, 33.407)), module, MultiLogic::G1Q_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(19.439, 58.873)), module, MultiLogic::G2Q__OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(19.439, 72.277)), module, MultiLogic::G2Q_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(19.439, 97.743)), module, MultiLogic::G3Q__OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(19.439, 111.147)), module, MultiLogic::G3Q_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(19.439, 20.004)), module, MultiLogic::NQOUT + 0));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(19.439, 33.407)), module, MultiLogic::QOUT + 0));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(19.439, 58.873)), module, MultiLogic::NQOUT + 1));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(19.439, 72.277)), module, MultiLogic::QOUT + 1));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(19.439, 97.743)), module, MultiLogic::NQOUT + 2));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(19.439, 111.147)), module, MultiLogic::QOUT + 2));
 	}
 };
 
