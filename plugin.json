@@ -24,6 +24,12 @@
       "name": "MarkovDrummer",
       "description": "Probablistic trigger sequencer based of Markov chains",
       "tags": []
+    },
+    {
+      "slug": "MultiLogic",
+      "name": "MultiLogic",
+      "description": "three logic gates that can each be AND,OR,XOR,NOT with inverted outputs",
+      "tags": []
     }
   ]
 }
