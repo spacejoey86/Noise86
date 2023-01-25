@@ -22,7 +22,8 @@ struct EyeSeq : Module {
 		LIGHTS_LEN
 	};
 
-	dsp::TSchmittTrigger<float> clk, reset;
+	dsp::TSchmittTrigger<float> reset;
+	bool prevClock = false;
 	int step = 0;
 
 	EyeSeq() {
@@ -55,16 +56,17 @@ struct EyeSeq : Module {
 		if (reset.process(inputs[RESET_INPUT].getVoltage(), 0.1f, 1.f)) {
 			step = 0;
 		}
-		else if (clk.process(inputs[CLK_INPUT].getVoltage(), 0.1f, 1.f)) {
+		else if ((inputs[CLK_INPUT].getVoltage() > 3.f ? true : false) != prevClock) {
 			step += 1;
-			if (step > 16) {
+			if (step > 720720) { //LCM of the numbers 1 to 16 is 720720
 				step = 1;
 			}
+			prevClock = inputs[CLK_INPUT].getVoltage();
 		}
 
 		float output = 0;
 		for (int i = 0; i < 6; i++) {
-			if (step % (int) params[DIVS + i].getValue() == 0) {
+			if (step % (int) params[DIVS + i].getValue() * 2 < (int) params[DIVS + i].getValue()) {
 				lights[LIGHTS + i].setBrightness(1.f);
 				output += params[OFFSETS + i].getValue();
 			} else {
