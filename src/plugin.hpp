@@ -9,6 +9,7 @@ extern Plugin* pluginInstance;
 
 // Declare each Model, defined in each module source file
 // extern Model* modelMyModule;
-extern Model* modelTransquant;
+extern Model* modelTransQuant;
 extern Model* modelMarkovDrummer;
 extern Model* modelMultiLogic;
+extern Model* modelEyeSeq;

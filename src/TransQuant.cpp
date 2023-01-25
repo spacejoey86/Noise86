@@ -1,7 +1,7 @@
 #include "plugin.hpp"
 
 
-struct Transquant : Module {
+struct TransQuant : Module {
 	enum ParamId {
 		TRANSPOSE_PARAM,
 		INTERVAL_PARAM,
@@ -46,7 +46,7 @@ struct Transquant : Module {
 			{-0.167, 0.000, 0.083, 0.250, 0.417, 0.500, 0.667, 0.833, 0.000}  //Locrian
 		};
 
-	Transquant() {
+	TransQuant() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		
 		configParam(TRANSPOSE_PARAM, 0.f, 11.f, 0.f, "Transpose");
@@ -149,8 +149,8 @@ struct Transquant : Module {
 };
 
 
-struct TransquantWidget : ModuleWidget {
-	TransquantWidget(Transquant* module) {
+struct TransQuantWidget : ModuleWidget {
+	TransQuantWidget(TransQuant* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/transquant.svg")));
 
@@ -159,27 +159,27 @@ struct TransquantWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(33.724, 36.236)), module, Transquant::TRANSPOSE_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(33.724, 51.87)), module, Transquant::INTERVAL_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(33.724, 67.579)), module, Transquant::MODE_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(33.724, 36.236)), module, TransQuant::TRANSPOSE_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(33.724, 51.87)), module, TransQuant::INTERVAL_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(33.724, 67.579)), module, TransQuant::MODE_PARAM));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.916, 20.749)), module, Transquant::UP_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(33.724, 20.749)), module, Transquant::DOWN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.916, 36.236)), module, Transquant::TRANSPOSE_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.916, 51.87)), module, Transquant::INTERVAL_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.916, 67.579)), module, Transquant::MODE_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.916, 88.992)), module, Transquant::QUANT_INS + 0));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.916, 102.395)), module, Transquant::QUANT_INS + 1));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.916, 115.799)), module, Transquant::QUANT_INS + 2));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.916, 20.749)), module, TransQuant::UP_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(33.724, 20.749)), module, TransQuant::DOWN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.916, 36.236)), module, TransQuant::TRANSPOSE_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.916, 51.87)), module, TransQuant::INTERVAL_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.916, 67.579)), module, TransQuant::MODE_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.916, 88.992)), module, TransQuant::QUANT_INS + 0));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.916, 102.395)), module, TransQuant::QUANT_INS + 1));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.916, 115.799)), module, TransQuant::QUANT_INS + 2));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.32, 88.992)), module, Transquant::TRIGS + 0));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.32, 102.395)), module, Transquant::TRIGS + 1));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.32, 115.799)), module, Transquant::TRIGS + 2));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(33.724, 88.992)), module, Transquant::OUTS + 0));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(33.724, 102.395)), module, Transquant::OUTS + 1));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(33.724, 115.799)), module, Transquant::OUTS + 2));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.32, 88.992)), module, TransQuant::TRIGS + 0));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.32, 102.395)), module, TransQuant::TRIGS + 1));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.32, 115.799)), module, TransQuant::TRIGS + 2));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(33.724, 88.992)), module, TransQuant::OUTS + 0));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(33.724, 102.395)), module, TransQuant::OUTS + 1));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(33.724, 115.799)), module, TransQuant::OUTS + 2));
 	}
 };
 
 
-Model* modelTransquant = createModel<Transquant, TransquantWidget>("Transquant");
+Model* modelTransQuant = createModel<TransQuant, TransQuantWidget>("TransQuant");
