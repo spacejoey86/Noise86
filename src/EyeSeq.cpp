@@ -5,7 +5,6 @@ struct EyeSeq : Module {
 	enum ParamId {
 		ENUMS(DIVS, 6),
 		ENUMS(OFFSETS, 6),
-		ATTEN_PARAM,
 		PARAMS_LEN
 	};
 	enum InputId {
@@ -46,7 +45,6 @@ struct EyeSeq : Module {
 		configParam(OFFSETS + 3, -1.f, 1.f, 0.f, "Offset 4");
 		configParam(OFFSETS + 4, -1.f, 1.f, 0.f, "Offset 5");
 		configParam(OFFSETS + 5, -1.f, 1.f, 0.f, "Offset 6");
-		configParam(ATTEN_PARAM, 0.f, 10.f, 2.f, "Output attenuator");
 		configInput(CLK_INPUT, "Clock");
 		configInput(RESET_INPUT, "Reset");
 		configOutput(OUTPUT_OUTPUT, "Output");
@@ -101,7 +99,6 @@ struct EyeSeqWidget : ModuleWidget {
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(23.057, 91.855)), module, EyeSeq::OFFSETS + 4));
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(7.423, 104.783)), module, EyeSeq::DIVS + 5));
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(23.057, 104.783)), module, EyeSeq::OFFSETS + 5));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(7.423, 116.986)), module, EyeSeq::ATTEN_PARAM));
 
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.423, 24.506)), module, EyeSeq::CLK_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.057, 24.506)), module, EyeSeq::RESET_INPUT));
