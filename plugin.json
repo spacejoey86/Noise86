@@ -4,12 +4,12 @@
   "version": "2.0.0",
   "license": "GPL-3.0-or-later",
   "brand": "Noise86",
-  "author": "An",
+  "author": "Dylan Gardham",
   "authorEmail": "message4dylan@gmail.com",
   "authorUrl": "",
   "pluginUrl": "",
-  "manualUrl": "",
-  "sourceUrl": "",
+  "manualUrl": "https://github.com/spacejoey86/Noise86/blob/master/README.md",
+  "sourceUrl": "https://github.com/spacejoey86/Noise86",
   "donateUrl": "",
   "changelogUrl": "",
   "modules": [
@@ -17,25 +17,25 @@
       "slug": "MarkovDrummer",
       "name": "MarkovDrummer",
       "description": "Probablistic trigger sequencer based of Markov chains",
-      "tags": []
+      "tags": [“Drum”, “Sequencer”]
     },
     {
       "slug": "MultiLogic",
       "name": "MultiLogic",
-      "description": "three logic gates that can each be AND,OR,XOR,NOT with inverted outputs",
-      "tags": []
+      "description": "Three multi-function logic gates that can each be AND,OR,XOR,NOT with inverted outputs",
+      "tags": [“Logic”]
     },
     {
       "slug": "EyeSeq",
       "name": "EyeSeq",
-      "description": "weighted sum of a clock divider",
-      "tags": []
+      "description": "Weighted sum of a clock divider",
+      "tags": [“Digital”, “Sequencer”]
     },
     {
       "slug": "TransQuant",
       "name": "TransQuant",
-      "description": "",
-      "tags": []
+      "description": "Quantiser with triggers to transpose by a CV controleable interval",
+      "tags": [“Clock modulator”, “Digital”, “Quantizer”]
     }
   ]
 }
