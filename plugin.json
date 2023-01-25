@@ -17,25 +17,25 @@
       "slug": "MarkovDrummer",
       "name": "MarkovDrummer",
       "description": "Probablistic trigger sequencer based of Markov chains",
-      "tags": [“Drum”, “Sequencer”]
+      "tags": ["Drum", "Sequencer"]
     },
     {
       "slug": "MultiLogic",
       "name": "MultiLogic",
       "description": "Three multi-function logic gates that can each be AND,OR,XOR,NOT with inverted outputs",
-      "tags": [“Logic”]
+      "tags": ["Logic"]
     },
     {
       "slug": "EyeSeq",
       "name": "EyeSeq",
       "description": "Weighted sum of a clock divider",
-      "tags": [“Digital”, “Sequencer”]
+      "tags": ["Digital", "Sequencer"]
     },
     {
       "slug": "TransQuant",
       "name": "TransQuant",
       "description": "Quantiser with triggers to transpose by a CV controleable interval",
-      "tags": [“Clock modulator”, “Digital”, “Quantizer”]
+      "tags": ["Clock modulator", "Digital", "Quantizer"]
     }
   ]
 }
