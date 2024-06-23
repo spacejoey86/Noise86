@@ -21,6 +21,7 @@ struct SeqOfChanges : Module {
 	};
 
 	dsp::TSchmittTrigger<float> reset;
+	bool prevClock = false;
 	int state = 0; // first three bits represent the previous three outputs
 
 
@@ -36,13 +37,19 @@ struct SeqOfChanges : Module {
 		configParam(PROBABILITIES + 7, 0.f, 1.f, 0.f, "Qian");
 		configInput(CLK_INPUT, "Clock");
 		configInput(RESET_INPUT, "Reset");
-		configOutput(OUT_OUTPUT, "Output");
+		configOutput(OUT_OUTPUT, "Trigger");
 	}
 
 	void process(const ProcessArgs& args) override {
 		if (reset.process(inputs[RESET_INPUT].getVoltage(), 0.1f, 1.f)) {
-			step = 0;
+			state = 0;
 		}
+		else if ((inputs[CLK_INPUT].getVoltage() > 3.f) && !prevClock) {
+			bool nextTrig = random::uniform() > params[PROBABILITIES + state].getValue();
+			state = state >> 1;
+			state += (int) nextTrig * 4;
+		}
+		prevClock = inputs[CLK_INPUT].getVoltage() > 3.f;
 	}
 };
 

@@ -54,13 +54,13 @@ struct EyeSeq : Module {
 		if (reset.process(inputs[RESET_INPUT].getVoltage(), 0.1f, 1.f)) {
 			step = 0;
 		}
-		else if ((inputs[CLK_INPUT].getVoltage() > 3.f ? true : false) != prevClock) {
+		else if ((inputs[CLK_INPUT].getVoltage() > 3.f) && !prevClock) {
 			step += 1;
 			if (step > 720720) { //LCM of the numbers 1 to 16 is 720720
 				step = 1;
 			}
-			prevClock = inputs[CLK_INPUT].getVoltage();
 		}
+		prevClock = inputs[CLK_INPUT].getVoltage() > 3.f;
 
 		float output = 0;
 		for (int i = 0; i < 6; i++) {
