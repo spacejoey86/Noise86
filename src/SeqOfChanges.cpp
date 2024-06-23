@@ -21,7 +21,7 @@ struct SeqOfChanges : Module {
 		LIGHTS_LEN
 	};
 
-	// dsp::TSchmittTrigger<float> reset;
+	dsp::TSchmittTrigger<float> resets[8];
 	dsp::PulseGenerator trigGen;
 	bool prevClock = false;
 	int state = 0; // first three bits represent the previous three outputs
@@ -48,16 +48,20 @@ struct SeqOfChanges : Module {
 		configInput(TRIGS + 6, "Dui");
 		configInput(TRIGS + 7, "Qian");
 
-		configOutput(CV_OUT_OUTPUT, "CV");
 		configOutput(OUT_OUTPUT, "Trigger");
+		configOutput(CV_OUT_OUTPUT, "CV");
 	}
 
 	void process(const ProcessArgs& args) override {
-		// if (reset.process(inputs[RESET_INPUT].getVoltage(), 0.1f, 1.f)) {
-		// 	state = 0;
-		// }
-		// else
-		if ((inputs[CLK_INPUT].getVoltage() > 3.f) && !prevClock) {
+		bool resetThisTick = false;
+		for (int i = 0; i < 8; i++) {
+			if (resets[i].process(inputs[TRIGS + i].getVoltage(), 0.1f, 1.f)) {
+				state = i;
+				resetThisTick = true;
+			}
+		}
+
+		if (!resetThisTick && (inputs[CLK_INPUT].getVoltage() > 3.f) && !prevClock) {
 			bool nextTrig = random::uniform() < params[PROBABILITIES + state].getValue();
 			state = state >> 1;
 			if ((int) nextTrig) {
@@ -72,16 +76,11 @@ struct SeqOfChanges : Module {
 
 		bool trig = trigGen.process(args.sampleTime);
 		outputs[OUT_OUTPUT].setVoltage(trig ? 10.f : 0.f);
+		outputs[CV_OUT_OUTPUT].setVoltage((float) params[PROBABILITIES + state].getValue() * 10);
 
-		// state = 0b001;
 		lights[LIGHTS + 0].setBrightness(((state & 0b001) > 0) ? 1.f : 0.f);
 		lights[LIGHTS + 1].setBrightness(((state & 0b010) > 0) ? 1.f : 0.f);
 		lights[LIGHTS + 2].setBrightness(((state & 0b100) > 0) ? 1.f : 0.f);
-
-		// for (int i = 0; i < 3; i++) {
-		// 	bool light_state = (state >> i) & 0b001;
-		// 	lights[LIGHTS + i].setBrightness(light_state ? 1.f : 0.f);
-		// }
 
 	}
 };
@@ -116,8 +115,8 @@ struct SeqOfChangesWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.606, 93.446)), module, SeqOfChanges::TRIGS + 6));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.774, 116.791)), module, SeqOfChanges::TRIGS + 7));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.781, 67.729)), module, SeqOfChanges::CV_OUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.534, 78.812)), module, SeqOfChanges::OUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.781, 67.729)), module, SeqOfChanges::OUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.534, 78.812)), module, SeqOfChanges::CV_OUT_OUTPUT));
 
 		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(55.803, 61.538)), module, SeqOfChanges::LIGHTS + 0));
 		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(55.803, 69.047)), module, SeqOfChanges::LIGHTS + 1));
