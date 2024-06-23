@@ -12,6 +12,7 @@ struct SeqOfChanges : Module {
 		INPUTS_LEN
 	};
 	enum OutputId {
+		ENUMS(STATE_OUTS, 3),
 		CV_OUT_OUTPUT,
 		OUT_OUTPUT,
 		OUTPUTS_LEN
@@ -48,6 +49,9 @@ struct SeqOfChanges : Module {
 		configInput(TRIGS + 6, "Dui");
 		configInput(TRIGS + 7, "Qian");
 
+		configOutput(STATE_OUTS + 0, "State 1");
+		configOutput(STATE_OUTS + 1, "State 2");
+		configOutput(STATE_OUTS + 2, "State 3");
 		configOutput(OUT_OUTPUT, "Trigger");
 		configOutput(CV_OUT_OUTPUT, "CV");
 	}
@@ -75,6 +79,9 @@ struct SeqOfChanges : Module {
 		prevClock = inputs[CLK_INPUT].getVoltage() > 3.f;
 
 		bool trig = trigGen.process(args.sampleTime);
+		outputs[STATE_OUTS + 0].setVoltage((float) ((state & 0b001) > 0) * 10);
+		outputs[STATE_OUTS + 1].setVoltage((float) ((state & 0b010) > 0) * 10);
+		outputs[STATE_OUTS + 2].setVoltage((float) ((state & 0b100) > 0) * 10);
 		outputs[OUT_OUTPUT].setVoltage(trig ? 10.f : 0.f);
 		outputs[CV_OUT_OUTPUT].setVoltage((float) params[PROBABILITIES + state].getValue() * 10);
 
@@ -115,12 +122,15 @@ struct SeqOfChangesWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.606, 93.446)), module, SeqOfChanges::TRIGS + 6));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.774, 116.791)), module, SeqOfChanges::TRIGS + 7));
 
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(54.164, 57.107)), module, SeqOfChanges::STATE_OUTS + 0));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(54.164, 67.729)), module, SeqOfChanges::STATE_OUTS + 1));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(54.164, 78.812)), module, SeqOfChanges::STATE_OUTS + 2));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.781, 67.729)), module, SeqOfChanges::OUT_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.534, 78.812)), module, SeqOfChanges::CV_OUT_OUTPUT));
 
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(55.803, 61.538)), module, SeqOfChanges::LIGHTS + 0));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(55.803, 69.047)), module, SeqOfChanges::LIGHTS + 1));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(55.803, 76.556)), module, SeqOfChanges::LIGHTS + 2));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(57.328, 60.161)), module, SeqOfChanges::LIGHTS + 0));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(57.328, 70.845)), module, SeqOfChanges::LIGHTS + 1));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(57.328, 82.058)), module, SeqOfChanges::LIGHTS + 2));
 	}
 };
 

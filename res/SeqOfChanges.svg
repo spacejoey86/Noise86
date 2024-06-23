@@ -25,14 +25,14 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="1.6819304"
-     inkscape:cx="124.85653"
+     inkscape:cx="125.15381"
      inkscape:cy="291.33191"
-     inkscape:window-width="1080"
-     inkscape:window-height="1902"
-     inkscape:window-x="3600"
+     inkscape:window-width="1920"
+     inkscape:window-height="1062"
+     inkscape:window-x="1680"
      inkscape:window-y="18"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer1" />
+     inkscape:current-layer="layer2" />
   <defs
      id="defs2" />
   <g
@@ -457,6 +457,14 @@
        x="2.2220092"
        y="62.489456"
        inkscape:label="output background" />
+    <rect
+       style="display:inline;fill:#333333;stroke-width:0.194542"
+       id="rect1809-0"
+       width="11.117651"
+       height="32.069637"
+       x="49.038052"
+       y="51.993732"
+       inkscape:label="output background" />
     <g
        id="g951"
        transform="translate(6.4116746,-7.9720022)"
@@ -609,22 +617,22 @@
     <circle
        style="display:inline;fill:#ff00ff;fill-opacity:1;stroke-width:0.264583"
        id="path2787-83-2-0-1-97"
-       cx="55.802597"
-       cy="76.556358"
+       cx="57.328354"
+       cy="82.057755"
        r="3.8932071"
        inkscape:label="Light 3" />
     <circle
        style="display:inline;fill:#ff00ff;fill-opacity:1;stroke-width:0.264583"
        id="path2787-83-2-0-1-5"
-       cx="55.802597"
-       cy="69.047401"
+       cx="57.328354"
+       cy="70.844627"
        r="3.8932071"
        inkscape:label="Light 2" />
     <circle
        style="display:inline;fill:#ff00ff;fill-opacity:1;stroke-width:0.264583"
        id="path2787-83-2-0-1-1"
-       cx="55.802597"
-       cy="61.538445"
+       cx="57.328354"
+       cy="60.160671"
        r="3.8932071"
        inkscape:label="Light 1" />
     <circle
@@ -753,6 +761,27 @@
        cy="67.729034"
        r="3.8932071"
        inkscape:label="cv_out" />
+    <circle
+       style="display:inline;fill:#0000ff;stroke-width:0.264583"
+       id="path2787-7-6-0-6"
+       cx="54.164024"
+       cy="78.811844"
+       r="3.8932071"
+       inkscape:label="state_3" />
+    <circle
+       style="display:inline;fill:#0000ff;stroke-width:0.264583"
+       id="path2787-7-6-0-3"
+       cx="54.164024"
+       cy="67.729034"
+       r="3.8932071"
+       inkscape:label="state_2" />
+    <circle
+       style="display:inline;fill:#0000ff;stroke-width:0.264583"
+       id="path2787-7-6-0-9"
+       cx="54.164024"
+       cy="57.106628"
+       r="3.8932071"
+       inkscape:label="state_1" />
     <circle
        style="display:inline;fill:#00ff00;stroke-width:0.264583"
        id="path2787"
