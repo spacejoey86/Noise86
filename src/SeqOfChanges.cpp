@@ -31,17 +31,17 @@ struct SeqOfChanges : Module {
 
 	SeqOfChanges() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		configParam(LI_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(XUN_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(KUN_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(ZHEN_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(DUI_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(GEN_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(QIAN_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(KAN_PARAM, 0.f, 1.f, 0.f, "");
-		configInput(CLK_INPUT, "");
-		configInput(RESET_INPUT, "");
-		configOutput(OUT_OUTPUT, "");
+		configParam(LI_PARAM, 0.f, 1.f, 0.f, "Li");
+		configParam(XUN_PARAM, 0.f, 1.f, 0.f, "Xun");
+		configParam(KUN_PARAM, 0.f, 1.f, 0.f, "Kun");
+		configParam(ZHEN_PARAM, 0.f, 1.f, 0.f, "Zhen");
+		configParam(DUI_PARAM, 0.f, 1.f, 0.f, "Dui");
+		configParam(GEN_PARAM, 0.f, 1.f, 0.f, "Gen");
+		configParam(QIAN_PARAM, 0.f, 1.f, 0.f, "Qian");
+		configParam(KAN_PARAM, 0.f, 1.f, 0.f, "Kan");
+		configInput(CLK_INPUT, "Clock");
+		configInput(RESET_INPUT, "Reset");
+		configOutput(OUT_OUTPUT, "Output");
 	}
 
 	void process(const ProcessArgs& args) override {
