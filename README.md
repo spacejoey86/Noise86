@@ -30,6 +30,8 @@ Even steps have a knob for the probability to move to each of the odd steps. If 
 
 After a reset trigger, the next clock will cause the stage 1 output
 
+Video explaining how I use this module: https://www.youtube.com/watch?v=nMq6vZ9qzbw
+
 ## EyeSeq
 Weighted sum of a clock divider
 
