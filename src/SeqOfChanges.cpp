@@ -3,48 +3,92 @@
 
 struct SeqOfChanges : Module {
 	enum ParamId {
-		LI_PARAM,
-		XUN_PARAM,
-		KUN_PARAM,
-		ZHEN_PARAM,
-		DUI_PARAM,
-		GEN_PARAM,
-		QIAN_PARAM,
-		KAN_PARAM,
+		ENUMS(PROBABILITIES, 8),
 		PARAMS_LEN
 	};
 	enum InputId {
 		CLK_INPUT,
-		RESET_INPUT,
+		ENUMS(TRIGS, 8),
 		INPUTS_LEN
 	};
 	enum OutputId {
+		ENUMS(STATE_OUTS, 3),
+		CV_OUT_OUTPUT,
 		OUT_OUTPUT,
 		OUTPUTS_LEN
 	};
 	enum LightId {
-		LIGHT_1_LIGHT,
-		LIGHT_2_LIGHT,
-		LIGHT_3_LIGHT,
+		ENUMS(LIGHTS, 3),
 		LIGHTS_LEN
 	};
 
+	dsp::TSchmittTrigger<float> resets[8];
+	dsp::PulseGenerator trigGen;
+	bool prevClock = false;
+	int state = 0; // first three bits represent the previous three outputs
+
+
 	SeqOfChanges() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		configParam(LI_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(XUN_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(KUN_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(ZHEN_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(DUI_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(GEN_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(QIAN_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(KAN_PARAM, 0.f, 1.f, 0.f, "");
-		configInput(CLK_INPUT, "");
-		configInput(RESET_INPUT, "");
-		configOutput(OUT_OUTPUT, "");
+		configParam(PROBABILITIES + 0, 0.f, 1.f, 0.f, "Kun");
+		configParam(PROBABILITIES + 1, 0.f, 1.f, 0.f, "Gen");
+		configParam(PROBABILITIES + 2, 0.f, 1.f, 0.f, "Kan");
+		configParam(PROBABILITIES + 3, 0.f, 1.f, 0.f, "Xun");
+		configParam(PROBABILITIES + 4, 0.f, 1.f, 0.f, "Zhen");
+		configParam(PROBABILITIES + 5, 0.f, 1.f, 0.f, "Li");
+		configParam(PROBABILITIES + 6, 0.f, 1.f, 0.f, "Dui");
+		configParam(PROBABILITIES + 7, 0.f, 1.f, 0.f, "Qian");
+
+		configInput(CLK_INPUT, "Clock");
+		configInput(TRIGS + 0, "Kun");
+		configInput(TRIGS + 1, "Gen");
+		configInput(TRIGS + 2, "Kan");
+		configInput(TRIGS + 3, "Xun");
+		configInput(TRIGS + 4, "Zhen");
+		configInput(TRIGS + 5, "Li");
+		configInput(TRIGS + 6, "Dui");
+		configInput(TRIGS + 7, "Qian");
+
+		configOutput(STATE_OUTS + 0, "State 1");
+		configOutput(STATE_OUTS + 1, "State 2");
+		configOutput(STATE_OUTS + 2, "State 3");
+		configOutput(OUT_OUTPUT, "Trigger");
+		configOutput(CV_OUT_OUTPUT, "CV");
 	}
 
 	void process(const ProcessArgs& args) override {
+		bool resetThisTick = false;
+		for (int i = 0; i < 8; i++) {
+			if (resets[i].process(inputs[TRIGS + i].getVoltage(), 0.1f, 1.f)) {
+				state = i;
+				resetThisTick = true;
+			}
+		}
+
+		if (!resetThisTick && (inputs[CLK_INPUT].getVoltage() > 3.f) && !prevClock) {
+			bool nextTrig = random::uniform() < params[PROBABILITIES + state].getValue();
+			state = state >> 1;
+			if ((int) nextTrig) {
+				state = state | 0b100;
+			}
+
+			if (nextTrig) {
+				trigGen.trigger(1e-3f);
+			}
+		}
+		prevClock = inputs[CLK_INPUT].getVoltage() > 3.f;
+
+		bool trig = trigGen.process(args.sampleTime);
+		outputs[STATE_OUTS + 0].setVoltage((float) ((state & 0b001) > 0) * 10);
+		outputs[STATE_OUTS + 1].setVoltage((float) ((state & 0b010) > 0) * 10);
+		outputs[STATE_OUTS + 2].setVoltage((float) ((state & 0b100) > 0) * 10);
+		outputs[OUT_OUTPUT].setVoltage(trig ? 10.f : 0.f);
+		outputs[CV_OUT_OUTPUT].setVoltage((float) params[PROBABILITIES + state].getValue() * 10);
+
+		lights[LIGHTS + 0].setBrightness(((state & 0b001) > 0) ? 1.f : 0.f);
+		lights[LIGHTS + 1].setBrightness(((state & 0b010) > 0) ? 1.f : 0.f);
+		lights[LIGHTS + 2].setBrightness(((state & 0b100) > 0) ? 1.f : 0.f);
+
 	}
 };
 
@@ -59,23 +103,34 @@ struct SeqOfChangesWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(30.688, 74.21)), module, SeqOfChanges::LI_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(14.949, 83.536)), module, SeqOfChanges::XUN_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(46.101, 83.598)), module, SeqOfChanges::KUN_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(8.252, 97.134)), module, SeqOfChanges::ZHEN_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(52.708, 97.134)), module, SeqOfChanges::DUI_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(15.212, 110.773)), module, SeqOfChanges::GEN_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(46.296, 110.602)), module, SeqOfChanges::QIAN_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(30.688, 120.694)), module, SeqOfChanges::KAN_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(35.186, 21.304)), module, SeqOfChanges::PROBABILITIES + 0));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(46.442, 44.649)), module, SeqOfChanges::PROBABILITIES + 1));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(35.186, 58.919)), module, SeqOfChanges::PROBABILITIES + 2));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(46.442, 102.538)), module, SeqOfChanges::PROBABILITIES + 3));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(14.606, 44.503)), module, SeqOfChanges::PROBABILITIES + 4));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(35.186, 79.175)), module, SeqOfChanges::PROBABILITIES + 5));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(14.606, 102.521)), module, SeqOfChanges::PROBABILITIES + 6));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(35.186, 116.791)), module, SeqOfChanges::PROBABILITIES + 7));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.458, 25.393)), module, SeqOfChanges::CLK_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(30.828, 25.393)), module, SeqOfChanges::RESET_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.781, 57.107)), module, SeqOfChanges::CLK_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.774, 21.39)), module, SeqOfChanges::TRIGS + 0));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(46.442, 35.574)), module, SeqOfChanges::TRIGS + 1));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.774, 58.971)), module, SeqOfChanges::TRIGS + 2));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(46.442, 93.446)), module, SeqOfChanges::TRIGS + 3));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.826, 35.72)), module, SeqOfChanges::TRIGS + 4));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.774, 79.21)), module, SeqOfChanges::TRIGS + 5));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.606, 93.446)), module, SeqOfChanges::TRIGS + 6));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.774, 116.791)), module, SeqOfChanges::TRIGS + 7));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(44.742, 25.305)), module, SeqOfChanges::OUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(54.164, 57.107)), module, SeqOfChanges::STATE_OUTS + 0));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(54.164, 67.729)), module, SeqOfChanges::STATE_OUTS + 1));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(54.164, 78.812)), module, SeqOfChanges::STATE_OUTS + 2));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.781, 67.729)), module, SeqOfChanges::OUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.534, 78.812)), module, SeqOfChanges::CV_OUT_OUTPUT));
 
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(30.48, 38.308)), module, SeqOfChanges::LIGHT_1_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(30.48, 49.802)), module, SeqOfChanges::LIGHT_2_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(30.48, 61.296)), module, SeqOfChanges::LIGHT_3_LIGHT));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(57.328, 60.161)), module, SeqOfChanges::LIGHTS + 0));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(57.328, 70.845)), module, SeqOfChanges::LIGHTS + 1));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(57.328, 82.058)), module, SeqOfChanges::LIGHTS + 2));
 	}
 };
 

@@ -39,3 +39,10 @@ Each row has a knob to select the clock division, and then an offset which is ad
 
 ## MultiLogic
 Three of the same logic gates. If you connect the top of the three inputs, it is an XOR gate. If you connect the bottom two inputs, it is an AND gate. Otherwise, it is an OR gate. There is an inverted output. If you connect a single input, the inverted output is a NOT gate and the regular output is a sample delay
+
+## SeqOfChanges (New)
+Markov sequencer where the probability of the next trigger is based on the previous three triggers (the 'state').
+Each possible state has a knob to set the probability of a trigger, and a reset input that resets the module to start at that state.
+There is also a CV output that outputs the probability of the current state. Try using it as a related modulation source to the trigger pattern
+The state is ouput as three gates, and shown on LEDS.
+Arrows on the module show possible state transitions, with a solid line representing an outputed trigger, and a broken line representing no trigger.
