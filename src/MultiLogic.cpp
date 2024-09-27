@@ -39,24 +39,42 @@ struct MultiLogic : Module {
 
 	void process(const ProcessArgs& args) override {
 		for (int LGate = 0; LGate < 3; LGate++) {
-			bool result;
-			if (inputs[INPUTS + 0 + 3*LGate].isConnected() &&
-				inputs[INPUTS + 1 + 3*LGate].isConnected() &&
-				! inputs[INPUTS + 2 + 3*LGate].isConnected()) {
-				//XOR gate
-				result = (inputs[INPUTS + 0 + 3*LGate].getVoltage() > 2.f) != (inputs[INPUTS + 1 + 3*LGate].getVoltage() > 2.f);
+			// get the number of polyphonic channels
+			int top_channels = inputs[INPUTS + 0 + 3*LGate].getChannels();
+			int middle_channels = inputs[INPUTS + 1 + 3*LGate].getChannels();
+			int bottom_channels = inputs[INPUTS + 2 + 3*LGate].getChannels();
 
-			} else if (! inputs[INPUTS + 0 + 3*LGate].isConnected() &&
-						inputs[INPUTS + 1 + 3*LGate].isConnected() &&
-						inputs[INPUTS + 2 + 3*LGate].isConnected()) {
-				//AND gate
-				result = (inputs[INPUTS + 1 + 3*LGate].getVoltage() > 2.f) && (inputs[INPUTS + 2 + 3*LGate].getVoltage() > 2.f);
-			} else {
-				//OR gate
-				result = (inputs[INPUTS + 0 + 3*LGate].getVoltage() > 2.f) || (inputs[INPUTS + 1 + 3*LGate].getVoltage() > 2.f) || (inputs[INPUTS + 2 + 3*LGate].getVoltage() > 2.f);
+			int output_channels = std::max(top_channels, middle_channels);
+			output_channels = std::max(output_channels, bottom_channels);
+			outputs[QOUT + LGate].setChannels(output_channels);
+			outputs[NQOUT + LGate].setChannels(output_channels);
+
+			for (int PolyChannel = 0; PolyChannel < output_channels; PolyChannel++) {
+				bool result;
+
+				if (inputs[INPUTS + 0 + 3*LGate].isConnected() &&
+					inputs[INPUTS + 1 + 3*LGate].isConnected() &&
+					! inputs[INPUTS + 2 + 3*LGate].isConnected()) {
+					//XOR gate
+					result = (inputs[INPUTS + 0 + 3*LGate].getPolyVoltage(PolyChannel) > 2.f) !=
+						(inputs[INPUTS + 1 + 3*LGate].getPolyVoltage(PolyChannel) > 2.f);
+
+				} else if (! inputs[INPUTS + 0 + 3*LGate].isConnected() &&
+							inputs[INPUTS + 1 + 3*LGate].isConnected() &&
+							inputs[INPUTS + 2 + 3*LGate].isConnected()) {
+					//AND gate
+					result = (inputs[INPUTS + 1 + 3*LGate].getPolyVoltage(PolyChannel) > 2.f) &&
+						(inputs[INPUTS + 2 + 3*LGate].getPolyVoltage(PolyChannel) > 2.f);
+				} else {
+					//OR gate
+					result = (inputs[INPUTS + 0 + 3*LGate].getPolyVoltage(PolyChannel) > 2.f) ||
+						(inputs[INPUTS + 1 + 3*LGate].getPolyVoltage(PolyChannel) > 2.f) ||
+						(inputs[INPUTS + 2 + 3*LGate].getPolyVoltage(PolyChannel) > 2.f);
+				}
+				outputs[QOUT + LGate].setVoltage(result ? 10.f : 0.f, PolyChannel);
+				outputs[NQOUT + LGate].setVoltage(result ? 0.f : 10.f, PolyChannel);
 			}
-			outputs[QOUT + LGate].setVoltage(result ? 10.f : 0.f);
-			outputs[NQOUT + LGate].setVoltage(result ? 0.f : 10.f);
+
 		}
 	}
 };

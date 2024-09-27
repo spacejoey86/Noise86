@@ -27,7 +27,8 @@
       "name": "MultiLogic",
       "description": "Three multi-function logic gates that can each be AND,OR,XOR,NOT with inverted outputs",
       "tags": [
-        "Logic"
+        "Logic",
+        "Polyphonic"
       ]
     },
     {
