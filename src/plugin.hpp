@@ -14,3 +14,4 @@ extern Model* modelMarkovDrummer;
 extern Model* modelMultiLogic;
 extern Model* modelEyeSeq;
 extern Model* modelSeqOfChanges;
+extern Model* modelRepeat8;

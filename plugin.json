@@ -57,6 +57,15 @@
       "tags": [
         "Sequencer"
       ]
+    },
+    {
+      "slug": "Repeat8",
+      "name": "Repeat8",
+      "description": "8 step sequencer with patch programmable step repeat",
+      "tags": [
+        "logic",
+        "sequencer"
+      ]
     }
   ]
 }
