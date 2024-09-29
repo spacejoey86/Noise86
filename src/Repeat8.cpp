@@ -260,8 +260,8 @@ struct Repeat8Widget : ModuleWidget {
 		
 		addParam(createParamCentered<CKSS>(mm2px(Vec(10.662, 78.012)), module, Repeat8::ONE_SHOT_MODE_PARAM));
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(25.033, 78.012)), module, Repeat8::CV_SCALE_PARAM));
-		addParam(createLightParamCentered<VCVLightBezel<>>(mm2px(Vec(25.033, 97.6)), module, Repeat8::STEP_FORWARD_PARAM, Repeat8::STEP_FORWARD_LIGHT));
-		addParam(createLightParamCentered<VCVLightBezel<>>(mm2px(Vec(10.662, 97.6)), module, Repeat8::STEP_BACKWARD_PARAM, Repeat8::STEP_BACKWARD_LIGHT));
+		addParam(createLightParamCentered<VCVLightBezel<RedLight>>(mm2px(Vec(25.033, 97.6)), module, Repeat8::STEP_FORWARD_PARAM, Repeat8::STEP_FORWARD_LIGHT));
+		addParam(createLightParamCentered<VCVLightBezel<RedLight>>(mm2px(Vec(10.662, 97.6)), module, Repeat8::STEP_BACKWARD_PARAM, Repeat8::STEP_BACKWARD_LIGHT));
 
 		//Main sequencer jacks
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(53.775, 97.6)), module, Repeat8::CLK_INPUT));
