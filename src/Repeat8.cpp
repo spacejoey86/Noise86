@@ -43,11 +43,11 @@ struct Repeat8 : Module {
 		hard_reset_schmitt,
 		increase_schmitt,
 		counter_reset_schmitt;
-	int stage;
-	bool running;
-	bool prev_one_shot_mode;
+	int stage = 0;
+	bool running = true;
+	bool prev_one_shot_mode = false;
 
-	int counter;
+	int counter = 0;
 	dsp::PulseGenerator comparator_gate_gen;
 
 	Repeat8() {
@@ -117,7 +117,7 @@ struct Repeat8 : Module {
 	void process(const ProcessArgs& args) override {
 		//Sequencer part of the module
 		// check if repeat mode has been enabled
-		if (!prev_one_shot_mode && params[ONE_SHOT_MODE_PARAM].getValue() == 1) {
+		if (!prev_one_shot_mode && params[ONE_SHOT_MODE_PARAM].getValue() == 1.0f) {
 			running = true;
 		}
 		prev_one_shot_mode = params[ONE_SHOT_MODE_PARAM].getValue();
@@ -129,7 +129,7 @@ struct Repeat8 : Module {
 			stage = 0;
 			outputs[STAGE_GATE_OUTPUTS + 0].setVoltage(10.f);
 			lights[STAGE_LIGHTS + 0].setBrightness(1.f);
-			if (params[ONE_SHOT_MODE_PARAM].getValue() == 0) {
+			if (params[ONE_SHOT_MODE_PARAM].getValue() == 0.0f) {
 				running = false;
 			} else {
 				running = true;
