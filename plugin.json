@@ -59,13 +59,10 @@
       ]
     },
     {
-      "slug": "Repeat8",
-      "name": "Repeat8",
-      "description": "8 step sequencer with patch programmable step repeat",
-      "tags": [
-        "logic",
-        "sequencer"
-      ]
+      "slug": "RepeatBuddy",
+      "name": "RepeatBuddy",
+      "description": "Counter and comparator utility module capable of adding step repeat to a sequencer",
+      "tags": []
     }
   ]
 }
