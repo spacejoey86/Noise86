@@ -21,20 +21,8 @@ struct RepeatBuddy : Module {
 		OUTPUTS_LEN
 	};
 	enum LightId {
-		THRESHOLD_LED_7_LIGHT,
-		COUNTER_LED_7_LIGHT,
-		THRESHOLD_LED_6_LIGHT,
-		COUNTER_LED_6_LIGHT,
-		THRESHOLD_LED_5_LIGHT,
-		COUNTER_LED_5_LIGHT,
-		THRESHOLD_LED_4_LIGHT,
-		COUNTER_LED_4_LIGHT,
-		THRESHOLD_LED_3_LIGHT,
-		COUNTER_LED_3_LIGHT,
-		THRESHOLD_LED_2_LIGHT,
-		COUNTER_LED_2_LIGHT,
-		THRESHOLD_LED_1_LIGHT,
-		COUNTER_LED_1_LIGHT,
+		ENUMS(THRESHOLD_LIGHTS, 7),
+		ENUMS(COUNTER_LIGHTS, 7),
 		LIGHTS_LEN
 	};
 
@@ -55,7 +43,7 @@ struct RepeatBuddy : Module {
 		configParam(COUNTER_CV_ATTENUATOR_PARAM, 0.f, 1.f, 1.f, "Counter CV attenuator");
 		configOutput(COUNTER_CV_OUTPUT, "Counter CV");
 
-		configParam(DIVISION_ATTENUATOR_PARAM, 0.f, 1.f, 0.f, "Division CV attenuator");
+		configParam(DIVISION_ATTENUATOR_PARAM, 0.f, 1.f, 0.1f, "Division CV attenuator");
 		configInput(DIVISION_CV_INPUT, "Division CV");
 		configOutput(DIVIDED_TRIGGER_OUTPUT, "Divided");
 	}
@@ -66,33 +54,51 @@ struct RepeatBuddy : Module {
 		}
 	}
 
+	void setCounterLights(int counter) {
+		for (int i = 0; i < 7; i++) {
+			if (counter > i) {
+				lights[COUNTER_LIGHTS + i].setBrightness(1.f);
+			} else {
+				lights[COUNTER_LIGHTS + i].setBrightness(0.f);
+			}
+		}
+	}
+
+	void setThresholdLights(int threshold, int division) {
+		for (int i = 0; i < 7; i++) {
+			lights[THRESHOLD_LIGHTS + i].setBrightness((threshold >= i) * ((division != 0 && ((i % (division)) == 0)) ? 1.f : 0.2f));
+		}
+	}
+
 	void process(const ProcessArgs& args) override {
 		// get division value
 		int division = 1;
 		if (inputs[DIVISION_CV_INPUT].isConnected()) {
-			division = std::round(clamp(inputs[DIVISION_CV_INPUT].getVoltage() * params[DIVISION_ATTENUATOR_PARAM].getValue(), 0.0, 10.0));
+			division = std::round(rescale(clamp(inputs[DIVISION_CV_INPUT].getVoltage() * params[DIVISION_ATTENUATOR_PARAM].getValue(), 0.0, 10.0), 0.f, 10.f, 0.f, 8.f));
 		} else {
-			division = std::round(clamp(10.f * params[DIVISION_ATTENUATOR_PARAM].getValue(), 0.f, 10.f));
+			division = std::round(rescale(clamp(10.f * params[DIVISION_ATTENUATOR_PARAM].getValue(), 0.f, 10.f), 0.f, 10.f, 0.f, 8.f));
 		}
 
 		// handle reset
 		if (reset_schmitt.process(inputs[RESET_INPUT].getVoltage(), 0.1f, 1.f)) {
 			counter = 0;
+			setCounterLights(counter);
 
 			processDivider(counter, division);
 		}
 
 		// increase counter
 		if (increase_schmitt.process(inputs[INCREASE_INPUT].getVoltage(), 0.1f, 1.f)) {
-			counter = clamp(counter + 1, 0, 10);
+			counter = clamp(counter + 1, 0, 8);
+			setCounterLights(counter);
 
 			processDivider(counter, division);
 		}
 
 		// get threshold value
-		float threshold = 10.0;
+		float threshold = 8.0;
 		if (inputs[THRESHOLD_CV_INPUT].isConnected()) {
-			threshold = clamp(inputs[THRESHOLD_CV_INPUT].getVoltage(), 1.f, 10.f);
+			threshold = rescale(clamp(inputs[THRESHOLD_CV_INPUT].getVoltage(), 1.f, 10.f), 0.f, 10.f, 0.f, 8.f);
 		}
 
 		// compare counter to threshold
@@ -100,12 +106,14 @@ struct RepeatBuddy : Module {
 			comparator_gate_gen.trigger(1e-3f);
 			if (!inputs[RESET_INPUT].isConnected()) {
 				counter = 0;
+				setCounterLights(counter);
 				processDivider(counter, division);
 			}
 		}
 
+		setThresholdLights(threshold, division);
 		outputs[COMPARATOR_GATE_OUTPUT].setVoltage(comparator_gate_gen.process(args.sampleTime) ? 10.f : 0.f);
-		outputs[COUNTER_CV_OUTPUT].setVoltage(counter * params[COUNTER_CV_ATTENUATOR_PARAM].getValue());
+		outputs[COUNTER_CV_OUTPUT].setVoltage(rescale(counter, 0.f, 7.f, 0.f, 10.f) * params[COUNTER_CV_ATTENUATOR_PARAM].getValue());
 		outputs[DIVIDED_TRIGGER_OUTPUT].setVoltage(divider_pulse_gen.process(args.sampleTime) ? 10.f : 0.f);
 	}
 };
@@ -131,20 +139,21 @@ struct RepeatBuddyWidget : ModuleWidget {
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(14.886, 85.204)), module, RepeatBuddy::COUNTER_CV_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(14.886, 113.214)), module, RepeatBuddy::DIVIDED_TRIGGER_OUTPUT));
 
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(12.21, 24.993)), module, RepeatBuddy::THRESHOLD_LED_7_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(17.53, 24.993)), module, RepeatBuddy::COUNTER_LED_7_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(12.21, 28.64)), module, RepeatBuddy::THRESHOLD_LED_6_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(17.53, 28.64)), module, RepeatBuddy::COUNTER_LED_6_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(12.21, 32.287)), module, RepeatBuddy::THRESHOLD_LED_5_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(17.53, 32.287)), module, RepeatBuddy::COUNTER_LED_5_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(12.21, 35.933)), module, RepeatBuddy::THRESHOLD_LED_4_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(17.53, 35.933)), module, RepeatBuddy::COUNTER_LED_4_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(12.21, 39.58)), module, RepeatBuddy::THRESHOLD_LED_3_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(17.53, 39.58)), module, RepeatBuddy::COUNTER_LED_3_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(12.21, 43.227)), module, RepeatBuddy::THRESHOLD_LED_2_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(17.53, 43.227)), module, RepeatBuddy::COUNTER_LED_2_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(12.21, 46.873)), module, RepeatBuddy::THRESHOLD_LED_1_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(17.53, 46.873)), module, RepeatBuddy::COUNTER_LED_1_LIGHT));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(17.53, 46.873)), module, RepeatBuddy::COUNTER_LIGHTS + 0));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(17.53, 43.227)), module, RepeatBuddy::COUNTER_LIGHTS + 1));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(17.53, 39.58)), module, RepeatBuddy::COUNTER_LIGHTS + 2));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(17.53, 35.933)), module, RepeatBuddy::COUNTER_LIGHTS + 3));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(17.53, 32.287)), module, RepeatBuddy::COUNTER_LIGHTS + 4));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(17.53, 28.64)), module, RepeatBuddy::COUNTER_LIGHTS + 5));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(17.53, 24.993)), module, RepeatBuddy::COUNTER_LIGHTS + 6));
+
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(12.21, 46.873)), module, RepeatBuddy::THRESHOLD_LIGHTS + 0));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(12.21, 43.227)), module, RepeatBuddy::THRESHOLD_LIGHTS + 1));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(12.21, 39.58)), module, RepeatBuddy::THRESHOLD_LIGHTS + 2));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(12.21, 35.933)), module, RepeatBuddy::THRESHOLD_LIGHTS + 3));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(12.21, 32.287)), module, RepeatBuddy::THRESHOLD_LIGHTS + 4));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(12.21, 28.64)), module, RepeatBuddy::THRESHOLD_LIGHTS + 5));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(12.21, 24.993)), module, RepeatBuddy::THRESHOLD_LIGHTS + 6));
 	}
 };
 
