@@ -3,21 +3,21 @@
 
 struct RepeatBuddy : Module {
 	enum ParamId {
-		COUNTER_CV_ATTENUATOR_PARAMETER_PARAM,
-		DIVISION_ATTENUATOR_PARAMETER_PARAM,
+		COUNTER_CV_ATTENUATOR_PARAM,
+		DIVISION_ATTENUATOR_PARAM,
 		PARAMS_LEN
 	};
 	enum InputId {
-		THRESHOLD_CV_INPUT_INPUT,
-		INCREASE_TRIGGER_INPUT_INPUT,
-		COUNTER_RESET_INPUT_INPUT,
-		DIVISION_CV_INPUT_INPUT,
+		THRESHOLD_CV_INPUT,
+		INCREASE_INPUT,
+		RESET_INPUT,
+		DIVISION_CV_INPUT,
 		INPUTS_LEN
 	};
 	enum OutputId {
-		COMPARATOR_GATE_OUTPUT_OUTPUT,
-		COUNTER_CV_OUTPUT_OUTPUT,
-		DIVIDED_TRIGGER_OUTPUT_OUTPUT,
+		COMPARATOR_GATE_OUTPUT,
+		COUNTER_CV_OUTPUT,
+		DIVIDED_TRIGGER_OUTPUT,
 		OUTPUTS_LEN
 	};
 	enum LightId {
@@ -38,20 +38,53 @@ struct RepeatBuddy : Module {
 		LIGHTS_LEN
 	};
 
+	dsp::TSchmittTrigger<float> increase_schmitt,
+		reset_schmitt;
+	int counter = 0;
+	dsp::PulseGenerator comparator_gate_gen;
+
 	RepeatBuddy() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		configParam(COUNTER_CV_ATTENUATOR_PARAMETER_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(DIVISION_ATTENUATOR_PARAMETER_PARAM, 0.f, 1.f, 0.f, "");
-		configInput(THRESHOLD_CV_INPUT_INPUT, "");
-		configInput(INCREASE_TRIGGER_INPUT_INPUT, "");
-		configInput(COUNTER_RESET_INPUT_INPUT, "");
-		configInput(DIVISION_CV_INPUT_INPUT, "");
-		configOutput(COMPARATOR_GATE_OUTPUT_OUTPUT, "");
-		configOutput(COUNTER_CV_OUTPUT_OUTPUT, "");
-		configOutput(DIVIDED_TRIGGER_OUTPUT_OUTPUT, "");
+
+		configInput(THRESHOLD_CV_INPUT, "Comparator threshold");
+		configInput(INCREASE_INPUT, "Increase counter (clock)");
+		configInput(RESET_INPUT, "Reset counter");
+		configOutput(COMPARATOR_GATE_OUTPUT, "Comparator gate");
+
+		configParam(COUNTER_CV_ATTENUATOR_PARAM, 0.f, 1.f, 1.f, "Counter CV attenuator");
+		configOutput(COUNTER_CV_OUTPUT, "Counter CV");
+
+		configParam(DIVISION_ATTENUATOR_PARAM, 0.f, 1.f, 0.f, "Division CV attenuator");
+		configInput(DIVISION_CV_INPUT, "Division CV");
+		configOutput(DIVIDED_TRIGGER_OUTPUT, "Divided");
 	}
 
 	void process(const ProcessArgs& args) override {
+		// handle reset
+		if (reset_schmitt.process(inputs[RESET_INPUT].getVoltage(), 0.1f, 1.f)) {
+			counter = 0;
+		}
+
+		// increase counter
+		if (increase_schmitt.process(inputs[INCREASE_INPUT].getVoltage(), 0.1f, 1.f)) {
+			counter = clamp(counter + 1, 0, 10);
+		}
+
+		// get threshold value
+		float threshold = 10.0;
+		if (inputs[THRESHOLD_CV_INPUT].isConnected()) {
+			threshold = clamp(inputs[THRESHOLD_CV_INPUT].getVoltage(), 1.0, 10.0);
+		}
+
+		// compare counter to threshold
+		if ((float) counter >= threshold) {
+			comparator_gate_gen.trigger(1e-3f);
+			if (!inputs[RESET_INPUT].isConnected()) {
+				counter = 0;
+			}
+		}
+		outputs[COMPARATOR_GATE_OUTPUT].setVoltage(comparator_gate_gen.process(args.sampleTime) ? 10.f : 0.f);
+		outputs[COUNTER_CV_OUTPUT].setVoltage(counter * params[COUNTER_CV_ATTENUATOR_PARAM].getValue());
 	}
 };
 
@@ -66,17 +99,17 @@ struct RepeatBuddyWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.16, 71.199)), module, RepeatBuddy::COUNTER_CV_ATTENUATOR_PARAMETER_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.16, 99.209)), module, RepeatBuddy::DIVISION_ATTENUATOR_PARAMETER_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.16, 71.199)), module, RepeatBuddy::COUNTER_CV_ATTENUATOR_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.16, 99.209)), module, RepeatBuddy::DIVISION_ATTENUATOR_PARAM));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.434, 28.931)), module, RepeatBuddy::THRESHOLD_CV_INPUT_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.434, 42.936)), module, RepeatBuddy::INCREASE_TRIGGER_INPUT_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.434, 56.941)), module, RepeatBuddy::COUNTER_RESET_INPUT_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.434, 113.323)), module, RepeatBuddy::DIVISION_CV_INPUT_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.434, 28.931)), module, RepeatBuddy::THRESHOLD_CV_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.434, 42.936)), module, RepeatBuddy::INCREASE_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.434, 56.941)), module, RepeatBuddy::RESET_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.434, 113.323)), module, RepeatBuddy::DIVISION_CV_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(14.886, 57.194)), module, RepeatBuddy::COMPARATOR_GATE_OUTPUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(14.886, 85.204)), module, RepeatBuddy::COUNTER_CV_OUTPUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(14.886, 113.214)), module, RepeatBuddy::DIVIDED_TRIGGER_OUTPUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(14.886, 57.194)), module, RepeatBuddy::COMPARATOR_GATE_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(14.886, 85.204)), module, RepeatBuddy::COUNTER_CV_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(14.886, 113.214)), module, RepeatBuddy::DIVIDED_TRIGGER_OUTPUT));
 
 		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(12.21, 24.993)), module, RepeatBuddy::THRESHOLD_LED_7_LIGHT));
 		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(17.53, 24.993)), module, RepeatBuddy::COUNTER_LED_7_LIGHT));
