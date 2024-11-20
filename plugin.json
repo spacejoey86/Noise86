@@ -62,7 +62,10 @@
       "slug": "RepeatBuddy",
       "name": "RepeatBuddy",
       "description": "Counter and comparator utility module capable of adding step repeat to a sequencer",
-      "tags": []
+      "tags": [
+        "Sequencer",
+        "Clock modulator"
+      ]
     }
   ]
 }

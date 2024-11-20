@@ -41,7 +41,8 @@ struct RepeatBuddy : Module {
 	dsp::TSchmittTrigger<float> increase_schmitt,
 		reset_schmitt;
 	int counter = 0;
-	dsp::PulseGenerator comparator_gate_gen;
+	dsp::PulseGenerator comparator_gate_gen,
+		divider_pulse_gen;
 
 	RepeatBuddy() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -59,21 +60,39 @@ struct RepeatBuddy : Module {
 		configOutput(DIVIDED_TRIGGER_OUTPUT, "Divided");
 	}
 
+	void processDivider(int counter, int division) {
+		if (division != 0 && ((counter % (division)) == 0)) {
+			divider_pulse_gen.trigger(1e-3f);
+		}
+	}
+
 	void process(const ProcessArgs& args) override {
+		// get division value
+		int division = 1;
+		if (inputs[DIVISION_CV_INPUT].isConnected()) {
+			division = std::round(clamp(inputs[DIVISION_CV_INPUT].getVoltage() * params[DIVISION_ATTENUATOR_PARAM].getValue(), 0.0, 10.0));
+		} else {
+			division = std::round(clamp(10.f * params[DIVISION_ATTENUATOR_PARAM].getValue(), 0.f, 10.f));
+		}
+
 		// handle reset
 		if (reset_schmitt.process(inputs[RESET_INPUT].getVoltage(), 0.1f, 1.f)) {
 			counter = 0;
+
+			processDivider(counter, division);
 		}
 
 		// increase counter
 		if (increase_schmitt.process(inputs[INCREASE_INPUT].getVoltage(), 0.1f, 1.f)) {
 			counter = clamp(counter + 1, 0, 10);
+
+			processDivider(counter, division);
 		}
 
 		// get threshold value
 		float threshold = 10.0;
 		if (inputs[THRESHOLD_CV_INPUT].isConnected()) {
-			threshold = clamp(inputs[THRESHOLD_CV_INPUT].getVoltage(), 1.0, 10.0);
+			threshold = clamp(inputs[THRESHOLD_CV_INPUT].getVoltage(), 1.f, 10.f);
 		}
 
 		// compare counter to threshold
@@ -81,10 +100,13 @@ struct RepeatBuddy : Module {
 			comparator_gate_gen.trigger(1e-3f);
 			if (!inputs[RESET_INPUT].isConnected()) {
 				counter = 0;
+				processDivider(counter, division);
 			}
 		}
+
 		outputs[COMPARATOR_GATE_OUTPUT].setVoltage(comparator_gate_gen.process(args.sampleTime) ? 10.f : 0.f);
 		outputs[COUNTER_CV_OUTPUT].setVoltage(counter * params[COUNTER_CV_ATTENUATOR_PARAM].getValue());
+		outputs[DIVIDED_TRIGGER_OUTPUT].setVoltage(divider_pulse_gen.process(args.sampleTime) ? 10.f : 0.f);
 	}
 };
 
@@ -95,9 +117,7 @@ struct RepeatBuddyWidget : ModuleWidget {
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/RepeatBuddy.svg")));
 
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.16, 71.199)), module, RepeatBuddy::COUNTER_CV_ATTENUATOR_PARAM));
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.16, 99.209)), module, RepeatBuddy::DIVISION_ATTENUATOR_PARAM));
