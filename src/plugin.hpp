@@ -15,3 +15,4 @@ extern Model* modelMultiLogic;
 extern Model* modelEyeSeq;
 extern Model* modelSeqOfChanges;
 extern Model* modelRepeatBuddy;
+extern Model* modelShiftComputer;

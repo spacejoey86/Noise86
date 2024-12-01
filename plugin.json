@@ -66,6 +66,14 @@
         "Sequencer",
         "Clock modulator"
       ]
+    },
+    {
+      "slug": "ShiftComputer",
+      "name": "ShiftComputer",
+      "description": "Bank of 10 sample and holds with patch programmable control",
+      "tags": [
+        "Sample and hold"
+      ]
     }
   ]
 }
