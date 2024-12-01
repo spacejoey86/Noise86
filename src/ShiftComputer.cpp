@@ -23,6 +23,10 @@ struct ShiftComputer : Module {
 		LIGHTS_LEN
 	};
 
+	dsp::TSchmittTrigger<float> sample_trig_schmitt;
+	float sampled_voltages [10] = {10.f, 10.f, 10.f, 10.f, 10.f, 10.f, 10.f, 10.f, 10.f, 10.f};
+	int previous_destination = 0;
+
 	ShiftComputer() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configParam(ATTENS + 0, 0.f, 1.f, 1.f, "Stage 1 output attenuator");
@@ -54,6 +58,41 @@ struct ShiftComputer : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
+		// calculate source and destination selection
+		int selected_source = 0;
+		if (inputs[SOURCE_SELECT_INPUT].isConnected()) {
+			selected_source = 9 - (int) clamp(std::round(inputs[SOURCE_SELECT_INPUT].getVoltage()), 0.f, 9.f);
+		}
+
+		int selected_destination = selected_source;
+		if (inputs[DESTINATION_SELECT_INPUT].isConnected()) {
+			selected_destination = 9 - (int) clamp(std::round(inputs[DESTINATION_SELECT_INPUT].getVoltage()), 0.f, 9.f);
+		}
+
+
+		// sample
+		if ((!inputs[SAMPLE_TRIG_INPUT].isConnected() && selected_destination != previous_destination) ||
+			sample_trig_schmitt.process(inputs[SAMPLE_TRIG_INPUT].getVoltage(), 0.1f, 1.0f)) {
+			if (selected_source == 0) {
+				if (inputs[EXTERNAL_SOURCE_INPUT].isConnected()) {
+					sampled_voltages[selected_destination] = inputs[EXTERNAL_SOURCE_INPUT].getVoltage();
+				} else {
+					sampled_voltages[selected_destination] = 10.f;
+				}
+			} else {
+				sampled_voltages[selected_destination] = sampled_voltages[selected_source - 1];
+			}
+
+		}
+
+		previous_destination = selected_destination;
+
+		// update outputs
+		for (int i = 0; i < 10; i++) {
+			lights[SOURCE + i].setBrightness(i == selected_source ? 1.0f : 0.0f);
+			lights[DESTINATION + i].setBrightness(i == selected_destination ? 1.0f : 0.0f);
+			outputs[STAGE + i].setVoltage(sampled_voltages[i] * params[ATTENS + i].getValue());
+		}
 	}
 };
 
