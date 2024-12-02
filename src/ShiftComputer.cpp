@@ -14,6 +14,7 @@ struct ShiftComputer : Module {
 		INPUTS_LEN
 	};
 	enum OutputId {
+		POLY_OUTPUT,
 		ENUMS(STAGE,10),
 		OUTPUTS_LEN
 	};
@@ -45,6 +46,7 @@ struct ShiftComputer : Module {
 		configInput(DESTINATION_SELECT_INPUT, "Destination select CV");
 		configInput(SAMPLE_TRIG_INPUT, "Sample trigger");
 
+		configOutput(POLY_OUTPUT, "Polyphonic");
 		configOutput(STAGE + 0, "Stage 1");
 		configOutput(STAGE + 1, "Stage 2");
 		configOutput(STAGE + 2, "Stage 3");
@@ -61,12 +63,12 @@ struct ShiftComputer : Module {
 		// calculate source and destination selection
 		int selected_source = 0;
 		if (inputs[SOURCE_SELECT_INPUT].isConnected()) {
-			selected_source = 9 - (int) clamp(std::round(inputs[SOURCE_SELECT_INPUT].getVoltage()), 0.f, 9.f);
+			selected_source = clamp((int) (rescale(clamp(inputs[SOURCE_SELECT_INPUT].getVoltage(), 0.f, 10.f), 0.f, 10.f, 10.f, 0.f)), 0, 10);
 		}
 
 		int selected_destination = selected_source;
 		if (inputs[DESTINATION_SELECT_INPUT].isConnected()) {
-			selected_destination = 9 - (int) clamp(std::round(inputs[DESTINATION_SELECT_INPUT].getVoltage()), 0.f, 9.f);
+			selected_destination = clamp((int) (rescale(clamp(inputs[DESTINATION_SELECT_INPUT].getVoltage(), 0.f, 10.f), 0.f, 10.f, 10.f, 0.f)), 0, 10);
 		}
 
 
@@ -88,10 +90,13 @@ struct ShiftComputer : Module {
 		previous_destination = selected_destination;
 
 		// update outputs
+		outputs[POLY_OUTPUT].setChannels(10);
 		for (int i = 0; i < 10; i++) {
 			lights[SOURCE + i].setBrightness(i == selected_source ? 1.0f : 0.0f);
 			lights[DESTINATION + i].setBrightness(i == selected_destination ? 1.0f : 0.0f);
-			outputs[STAGE + i].setVoltage(sampled_voltages[i] * params[ATTENS + i].getValue());
+			float output_val = sampled_voltages[i] * params[ATTENS + i].getValue();
+			outputs[STAGE + i].setVoltage(output_val);
+			outputs[POLY_OUTPUT].setVoltage(output_val, i);
 		}
 	}
 };
@@ -123,6 +128,7 @@ struct ShiftComputerWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.218, 21.602)), module, ShiftComputer::DESTINATION_SELECT_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(35.015, 21.602)), module, ShiftComputer::SAMPLE_TRIG_INPUT));
 
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(35.015, 31.541)), module, ShiftComputer::POLY_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(25.218, 38.996)), module, ShiftComputer::STAGE + 0));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(35.015, 47.693)), module, ShiftComputer::STAGE + 1));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(25.218, 56.39)), module, ShiftComputer::STAGE + 2));
