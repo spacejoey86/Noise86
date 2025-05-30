@@ -66,6 +66,16 @@
         "Sequencer",
         "Clock modulator"
       ]
+    },
+    {
+      "slug": "DualLFO",
+      "name": "DualLFO",
+      "description": "Dual oscillator suited to rungling when paired with a shift register",
+      "tags": [
+        "Dual",
+        "Low-frequency oscillator",
+        "Oscillator"
+      ]
     }
   ]
 }
