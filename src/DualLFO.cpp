@@ -1,5 +1,5 @@
 #include "plugin.hpp"
-
+#include <cmath>
 
 struct DualLFO : Module {
 	enum ParamId {
@@ -30,26 +30,42 @@ struct DualLFO : Module {
 		LIGHTS_LEN
 	};
 
+	float phase = 0.f;
+
 	DualLFO() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		configParam(BOTH_A_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(CV_A_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(FREQ_A_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(BOTH_B_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(CV_B_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(FREQ_B_PARAM, 0.f, 1.f, 0.f, "");
-		configInput(BOTH_INPUT, "");
-		configInput(CV_A_INPUT, "");
-		configInput(VOCT_A_INPUT, "");
-		configInput(CV_B_INPUT, "");
-		configInput(VOCT_B_INPUT, "");
-		configOutput(SQUARE_A_OUTPUT, "");
-		configOutput(TRI_A_OUTPUT, "");
-		configOutput(SQUARE_B_OUTPUT, "");
-		configOutput(TRI_B_OUTPUT, "");
+		configParam(BOTH_A_PARAM, -1.f, 1.f, 0.f, "Both -> A CV");
+		configParam(CV_A_PARAM, -1.f, 1.f, 0.f, "A CV");
+		configParam(FREQ_A_PARAM, 0.001f, 5000.f, 0.5f, "A Frequency", " Hz");
+		configParam(BOTH_B_PARAM, -1.f, 1.f, 0.f, "Both -> B CV");
+		configParam(CV_B_PARAM, -1.f, 1.f, 0.f, "B CV");
+		configParam(FREQ_B_PARAM, 0.001f, 5000.f, 0.5f, "B Frequency", " Hz", dsp::FREQ_SEMITONE, dsp::FREQ_C4);
+
+		configInput(BOTH_INPUT, "Both frequencies CV");
+		configInput(CV_A_INPUT, "Oscillator A frequency CV");
+		configInput(VOCT_A_INPUT, "Oscillator A V/Oct CV");
+		configInput(CV_B_INPUT, "Oscillator B frequency CV");
+		configInput(VOCT_B_INPUT, "Oscillator B V/Oct CV");
+
+		configOutput(SQUARE_A_OUTPUT, "Oscillator A Square");
+		configOutput(TRI_A_OUTPUT, "Oscillator A Triangle");
+		configOutput(SQUARE_B_OUTPUT, "Oscillator B Square");
+		configOutput(TRI_B_OUTPUT, "Oscillator B Triangle");
 	}
 
 	void process(const ProcessArgs& args) override {
+		float freq = params[FREQ_A_PARAM].getValue();
+		freq *= dsp::exp2_taylor5(inputs[VOCT_A_INPUT].getVoltage())
+			+ (inputs[BOTH_INPUT].getVoltage() * params[BOTH_A_PARAM].getValue())
+			+ (inputs[CV_A_INPUT].getVoltage() * params[CV_A_PARAM].getValue());
+		freq = clamp(freq, 0.f, 8000.f);
+		phase += args.sampleTime * (freq);
+		outputs[TRI_B_OUTPUT].setVoltage(freq);
+		phase -= std::floor(phase);
+
+		bool square_a = phase > 0.5f;
+		outputs[SQUARE_A_OUTPUT].setVoltage(square_a ? 10.f : 0.f);
+		outputs[TRI_A_OUTPUT].setVoltage(20.f * (phase - 0.5f) * (square_a ? -1.f : 1.f) + 5.f);
 	}
 };
 
